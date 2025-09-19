@@ -6,7 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Assistance from './pages/Assistance';
 import Weather from './pages/Weather';
 import Crops from './pages/Crops';
-import SoilAnalysis from './pages/SoilAnalysis';
+import Illness from './pages/Illness';
 import './App.css';
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
             <Route path="/assistance" element={<Assistance />} />
             <Route path="/weather" element={<Weather />} />
             <Route path="/crops" element={<Crops />} />
-            <Route path="/soil-analysis" element={<SoilAnalysis />} />
+            <Route path="/illness" element={<Illness />} />
           </Routes>
         </main>
         <Toaster 

@@ -6,22 +6,25 @@ import {
   HelpCircle, 
   Cloud, 
   Sprout, 
-  TestTube, 
+  Stethoscope, 
   Menu, 
   X,
   Leaf
 } from 'lucide-react';
 
+import { useI18n, languages } from '../i18n';
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { t, lang, setLang } = useI18n();
 
   const navItems = [
-    { path: '/', name: 'Dashboard', icon: Home },
-    { path: '/assistance', name: 'AI Assistance', icon: HelpCircle },
-    { path: '/weather', name: 'Weather', icon: Cloud },
-    { path: '/crops', name: 'Crop Database', icon: Sprout },
-    { path: '/soil-analysis', name: 'Soil Analysis', icon: TestTube },
+    { path: '/', name: t('nav.dashboard'), icon: Home },
+    { path: '/assistance', name: t('nav.assistance'), icon: HelpCircle },
+    { path: '/weather', name: t('nav.weather'), icon: Cloud },
+    { path: '/crops', name: t('nav.crops'), icon: Sprout },
+    { path: '/illness', name: t('nav.illness'), icon: Stethoscope },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -40,8 +43,8 @@ const Navbar = () => {
               <Leaf className="w-6 h-6 text-white" />
             </motion.div>
             <div>
-              <h1 className="text-xl font-bold gradient-text">Farmer Agent</h1>
-              <p className="text-xs text-gray-500">Tailored Assistance</p>
+              <h1 className="text-xl font-bold gradient-text">{t('appTitle')}</h1>
+              <p className="text-xs text-gray-500">{t('appSubtitle')}</p>
             </div>
           </Link>
 
@@ -72,6 +75,18 @@ const Navbar = () => {
                 </Link>
               );
             })}
+            <div className="ml-4">
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 form-input"
+                title={t('common.language')}
+              >
+                {Object.entries(languages).map(([code, label]) => (
+                  <option key={code} value={code}>{label}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -110,6 +125,18 @@ const Navbar = () => {
                   </Link>
                 );
               })}
+              <div className="px-4">
+                <label className="block text-xs text-gray-500 mb-1">{t('common.language')}</label>
+                <select
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 form-input"
+                >
+                  {Object.entries(languages).map(([code, label]) => (
+                    <option key={code} value={code}>{label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </motion.div>
         )}

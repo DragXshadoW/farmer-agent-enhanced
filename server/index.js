@@ -1,10 +1,26 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
 require('dotenv').config();
+// const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'), false);
+    }
+  }
+});
 
 // Middleware
 app.use(cors());
@@ -36,6 +52,8 @@ app.post('/api/assistance', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// OpenAI Chat Proxy (removed by user request)
 
 // Weather API
 app.get('/api/weather/:location', async (req, res) => {
@@ -94,6 +112,256 @@ app.post('/api/soil-analysis', (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// AI Image Analysis API for Crop Disease Detection
+app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'No image file provided' 
+      });
+    }
+
+    // In a real implementation, this would:
+    // 1. Process the uploaded image with AI/ML models
+    // 2. Use computer vision to identify crop type
+    // 3. Detect disease symptoms and patterns
+    // 4. Return detailed analysis results
+    
+    // For now, we'll simulate AI analysis based on image characteristics
+    const imageBuffer = req.file.buffer;
+    const imageSize = imageBuffer.length;
+    
+    // Mock analysis - in reality, this would use actual AI models
+    const mockAnalysis = {
+      cropType: 'Tomato', // AI would detect this from image
+      detectedSymptoms: ['Brown spots', 'Yellowing leaves'],
+      confidence: 0.85,
+      aiProcessed: true,
+      imageSize: imageSize,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Simulate AI processing time
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    res.json({ 
+      success: true, 
+      analysis: mockAnalysis 
+    });
+  } catch (error) {
+    console.error('Image analysis error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to analyze image with AI' 
+    });
+  }
+});
+
+// Enhanced Chat API with Context Awareness
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, context, conversationHistory } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Message is required' 
+      });
+    }
+
+    // Enhanced AI response generation
+    const response = await generateEnhancedChatResponse(message, context, conversationHistory);
+    
+    res.json({
+      success: true,
+      response: response.content,
+      suggestions: response.suggestions,
+      contextUpdate: response.contextUpdate,
+      weatherData: response.weatherData,
+      marketData: response.marketData,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Chat API error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to process chat message' 
+    });
+  }
+});
+
+// Enhanced Chat Response Generation
+async function generateEnhancedChatResponse(message, context, conversationHistory) {
+  const lowerMessage = message.toLowerCase();
+  
+  // Extract intent and entities
+  const intent = extractIntent(lowerMessage);
+  const entities = extractEntities(lowerMessage);
+  
+  // Generate contextual response
+  let response = await generateContextualResponse(intent, entities, context, conversationHistory);
+  
+  // Add suggestions based on context and intent
+  const suggestions = generateSuggestions(intent, entities, context);
+  
+  // Check for weather data if relevant
+  let weatherData = null;
+  if (intent === 'weather' && context.location) {
+    weatherData = await getWeatherData(context.location);
+  }
+  
+  // Check for market data if relevant
+  let marketData = null;
+  if (intent === 'market' && entities.crops) {
+    marketData = await getMarketData(entities.crops[0]);
+  }
+  
+  // Update context if new information is provided
+  let contextUpdate = null;
+  if (entities.crops && entities.crops.length > 0) {
+    contextUpdate = { crops: [...(context.crops || []), ...entities.crops] };
+  }
+  
+  return {
+    content: response,
+    suggestions: suggestions,
+    contextUpdate: contextUpdate,
+    weatherData: weatherData,
+    marketData: marketData
+  };
+}
+
+function extractIntent(message) {
+  const intents = {
+    weather: ['weather', 'rain', 'temperature', 'forecast', 'climate', 'storm'],
+    pest: ['pest', 'insect', 'bug', 'aphid', 'caterpillar', 'disease', 'infected'],
+    soil: ['soil', 'fertilizer', 'nutrient', 'ph', 'compost', 'dirt'],
+    crop: ['plant', 'seed', 'harvest', 'crop', 'variety', 'grow'],
+    irrigation: ['water', 'irrigation', 'drip', 'sprinkler', 'watering'],
+    market: ['price', 'market', 'sell', 'profit', 'cost', 'revenue'],
+    advice: ['how', 'what', 'when', 'where', 'why', 'help', 'advice']
+  };
+
+  for (const [intent, keywords] of Object.entries(intents)) {
+    if (keywords.some(keyword => message.includes(keyword))) {
+      return intent;
+    }
+  }
+  return 'general';
+}
+
+function extractEntities(message) {
+  const entities = {
+    crops: ['tomato', 'wheat', 'rice', 'corn', 'potato', 'onion', 'cotton', 'sugarcane', 'maize'],
+    locations: ['field', 'farm', 'garden', 'greenhouse', 'plot'],
+    timeframes: ['today', 'tomorrow', 'week', 'month', 'season', 'spring', 'summer', 'fall', 'winter'],
+    problems: ['yellow', 'brown', 'spots', 'wilting', 'dying', 'sick', 'rot', 'mold']
+  };
+
+  const foundEntities = {};
+  for (const [type, values] of Object.entries(entities)) {
+    const found = values.filter(value => message.includes(value));
+    if (found.length > 0) {
+      foundEntities[type] = found;
+    }
+  }
+  return foundEntities;
+}
+
+async function generateContextualResponse(intent, entities, context, history) {
+  const responses = {
+    weather: () => {
+      if (context.location) {
+        return `I can help you with weather information for your area. Based on your location, I recommend checking the forecast regularly and adjusting your farming practices accordingly. Would you like me to get the current weather data for your region?`;
+      }
+      return `I can help you with weather-related farming advice. To provide accurate weather information, could you tell me your location? I can then give you specific forecasts and recommendations.`;
+    },
+    
+    pest: () => {
+      const crop = entities.crops?.[0];
+      if (crop) {
+        return `For ${crop} pest control, I recommend an integrated approach: 1) Regular monitoring and early detection, 2) Use beneficial insects like ladybugs, 3) Apply organic treatments like neem oil or insecticidal soap, 4) Practice crop rotation. What specific pests are you seeing on your ${crop}?`;
+      }
+      return `I can help with comprehensive pest control strategies. What crops are you growing and what pests or diseases are you dealing with? I'll provide specific solutions based on your situation.`;
+    },
+    
+    soil: () => {
+      if (context.soilType) {
+        return `For your ${context.soilType} soil, I recommend regular testing every 3-6 months, adding organic matter like compost, and maintaining proper pH levels. What specific soil issues are you facing?`;
+      }
+      return `Soil health is the foundation of successful farming. I can help with soil testing, amendments, fertility management, and organic improvements. What's your current soil situation and what are you trying to achieve?`;
+    },
+    
+    crop: () => {
+      const crop = entities.crops?.[0];
+      if (crop) {
+        return `Excellent choice with ${crop}! I can provide specific advice on planting timing, spacing, care requirements, and harvesting. What stage is your ${crop} at currently, and what specific guidance do you need?`;
+      }
+      return `I can help you choose the right crops for your conditions and provide comprehensive growing advice. What are you planning to grow, and what's your farming environment like?`;
+    },
+    
+    irrigation: () => {
+      return `Efficient irrigation is crucial for water conservation and optimal plant health. I can help you choose the right irrigation system (drip, sprinkler, or flood), create watering schedules, and optimize water usage. What's your current irrigation setup and what challenges are you facing?`;
+    },
+    
+    market: () => {
+      return `I can help with market analysis, pricing strategies, and selling tips. I can provide current market prices, suggest the best times to sell, and help you maximize profits. What crops are you looking to sell and in what market?`;
+    },
+    
+    general: () => {
+      return `I'm your comprehensive farming assistant! I can help with crop planning, pest control, soil management, weather monitoring, irrigation, market strategies, and much more. What aspect of farming would you like to focus on today?`;
+    }
+  };
+
+  return responses[intent] ? responses[intent]() : responses.general();
+}
+
+function generateSuggestions(intent, entities, context) {
+  const suggestionMap = {
+    weather: ['Check weather forecast', 'Weather impact on crops', 'Seasonal planning', 'Storm preparation'],
+    pest: ['Natural pest control', 'Pest identification', 'Prevention strategies', 'Organic treatments'],
+    soil: ['Soil testing', 'Organic amendments', 'Fertilizer recommendations', 'pH adjustment'],
+    crop: ['Planting schedule', 'Crop care tips', 'Harvest timing', 'Variety selection'],
+    irrigation: ['Water efficiency', 'Irrigation systems', 'Watering schedule', 'Drip irrigation setup'],
+    market: ['Market prices', 'Selling strategies', 'Profit optimization', 'Market timing'],
+    general: ['Weather check', 'Pest control help', 'Soil health tips', 'Crop advice', 'Market analysis']
+  };
+
+  return suggestionMap[intent] || suggestionMap.general;
+}
+
+async function getWeatherData(location) {
+  // Mock weather data - in real implementation, integrate with weather API
+  return {
+    temperature: Math.floor(Math.random() * 30) + 10,
+    condition: ['Sunny', 'Cloudy', 'Rainy', 'Partly Cloudy'][Math.floor(Math.random() * 4)],
+    humidity: Math.floor(Math.random() * 40) + 30,
+    location: location
+  };
+}
+
+async function getMarketData(crop) {
+  // Mock market data - in real implementation, integrate with market API
+  const prices = {
+    tomato: 2.50,
+    wheat: 0.80,
+    rice: 1.20,
+    corn: 1.00,
+    potato: 1.50,
+    onion: 1.80,
+    cotton: 3.20,
+    sugarcane: 0.60
+  };
+  
+  return {
+    crop: crop,
+    price: prices[crop.toLowerCase()] || 1.00,
+    unit: 'kg',
+    trend: ['up', 'down', 'stable'][Math.floor(Math.random() * 3)]
+  };
+}
 
 // Helper functions
 function generateRecommendations(crop, soilType, weather, issue) {

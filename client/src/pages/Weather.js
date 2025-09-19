@@ -14,11 +14,13 @@ import {
   CheckCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useI18n } from '../i18n';
 
 const Weather = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [location, setLocation] = useState('Mumbai');
   const [loading, setLoading] = useState(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     fetchWeatherData();
@@ -122,11 +124,9 @@ const Weather = () => {
           <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-xl flex items-center justify-center">
             <Cloud className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-3xl font-bold gradient-text">Weather Forecast</h1>
+          <h1 className="text-3xl font-bold gradient-text">{t('weather.title')}</h1>
         </div>
-        <p className="text-gray-600 text-lg">
-          Get detailed weather information and farming recommendations
-        </p>
+        <p className="text-gray-600 text-lg">{t('weather.sub')}</p>
       </motion.div>
 
       {/* Location Input */}
@@ -141,7 +141,7 @@ const Weather = () => {
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="Enter your location..."
+            placeholder={t('weather.inputPlaceholder')}
             className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent form-input"
           />
           <motion.button
@@ -150,7 +150,7 @@ const Weather = () => {
             onClick={fetchWeatherData}
             className="px-6 py-3 bg-gradient-to-r from-blue-400 to-cyan-600 text-white rounded-xl font-medium hover:from-blue-500 hover:to-cyan-700 transition-all duration-300"
           >
-            Update
+            {t('weather.update')}
           </motion.button>
         </div>
       </motion.div>
@@ -164,7 +164,7 @@ const Weather = () => {
             transition={{ delay: 0.2 }}
             className="glass rounded-2xl p-8"
           >
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Current Weather - {location}</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('weather.current')} {location}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="flex justify-center mb-4">
@@ -179,7 +179,7 @@ const Weather = () => {
               <div className="bg-white/50 rounded-xl p-4">
                 <div className="flex items-center space-x-3 mb-2">
                   <Droplets className="w-5 h-5 text-blue-500" />
-                  <span className="font-medium">Humidity</span>
+                  <span className="font-medium">{t('weather.humidity')}</span>
                 </div>
                 <p className="text-2xl font-bold text-gray-800">{weatherData.current.humidity}%</p>
               </div>
@@ -187,7 +187,7 @@ const Weather = () => {
               <div className="bg-white/50 rounded-xl p-4">
                 <div className="flex items-center space-x-3 mb-2">
                   <Wind className="w-5 h-5 text-gray-500" />
-                  <span className="font-medium">Wind Speed</span>
+                  <span className="font-medium">{t('weather.wind')}</span>
                 </div>
                 <p className="text-2xl font-bold text-gray-800">{weatherData.current.windSpeed} km/h</p>
               </div>
@@ -195,7 +195,7 @@ const Weather = () => {
               <div className="bg-white/50 rounded-xl p-4">
                 <div className="flex items-center space-x-3 mb-2">
                   <Eye className="w-5 h-5 text-purple-500" />
-                  <span className="font-medium">Visibility</span>
+                  <span className="font-medium">{t('weather.visibility')}</span>
                 </div>
                 <p className="text-2xl font-bold text-gray-800">{weatherData.current.visibility} km</p>
               </div>
@@ -211,7 +211,7 @@ const Weather = () => {
           >
             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
               <Calendar className="w-6 h-6 mr-2 text-blue-500" />
-              5-Day Forecast
+              {t('weather.forecastTitle')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               {weatherData.forecast.map((day, index) => (
@@ -244,7 +244,7 @@ const Weather = () => {
             >
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <AlertTriangle className="w-6 h-6 mr-2 text-yellow-500" />
-                Weather Alerts
+                {t('weather.alerts')}
               </h2>
               <div className="space-y-4">
                 {weatherData.alerts.map((alert, index) => {
@@ -273,7 +273,7 @@ const Weather = () => {
           >
             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
               <CheckCircle className="w-6 h-6 mr-2 text-green-500" />
-              Farming Recommendations
+              {t('weather.recommendations')}
             </h2>
             <div className="space-y-3">
               {getFarmingRecommendations(weatherData).map((recommendation, index) => (

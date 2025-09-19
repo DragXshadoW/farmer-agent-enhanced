@@ -16,10 +16,12 @@ import {
   Users
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useI18n } from '../i18n';
 
 const Dashboard = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useI18n();
 
   useEffect(() => {
     // Simulate API call
@@ -71,29 +73,29 @@ const Dashboard = () => {
 
   const quickActions = [
     {
-      title: 'Get AI Assistance',
-      description: 'Get personalized farming advice',
+      title: t('nav.assistance'),
+      description: t('assistance.sub'),
       icon: '🤖',
       path: '/assistance',
       color: 'from-green-400 to-emerald-600'
     },
     {
-      title: 'Check Weather',
-      description: 'View detailed weather forecast',
+      title: t('nav.weather'),
+      description: t('weather.sub'),
       icon: '🌤️',
       path: '/weather',
       color: 'from-blue-400 to-cyan-600'
     },
     {
-      title: 'Crop Database',
-      description: 'Explore crop information',
+      title: t('nav.crops'),
+      description: t('crops.sub'),
       icon: '🌾',
       path: '/crops',
       color: 'from-yellow-400 to-orange-600'
     },
     {
-      title: 'Soil Analysis',
-      description: 'Analyze soil conditions',
+      title: t('nav.soil'),
+      description: t('soil.sub'),
       icon: '🧪',
       path: '/soil-analysis',
       color: 'from-purple-400 to-indigo-600'
@@ -134,10 +136,10 @@ const Dashboard = () => {
         className="text-center"
       >
         <h1 className="text-4xl font-bold gradient-text mb-2">
-          Welcome to Farmer Agent
+          {t('dashboard.welcome')}
         </h1>
         <p className="text-gray-600 text-lg">
-          Your AI-powered farming companion for tailored assistance
+          {t('dashboard.sub')}
         </p>
       </motion.div>
 
@@ -150,7 +152,7 @@ const Dashboard = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Current Weather</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('dashboard.currentWeather')}</h2>
             <div className="flex items-center space-x-4 text-gray-600">
               <div className="flex items-center space-x-2">
                 <Thermometer className="w-5 h-5" />
@@ -209,7 +211,7 @@ const Dashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('dashboard.quickActions')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action, index) => (
             <Link key={action.title} to={action.path}>
@@ -237,7 +239,7 @@ const Dashboard = () => {
           className="glass rounded-2xl p-6"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-800">Weekly Progress</h3>
+            <h3 className="text-xl font-bold text-gray-800">{t('dashboard.weekly')}</h3>
             <BarChart3 className="w-6 h-6 text-gray-600" />
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -260,7 +262,7 @@ const Dashboard = () => {
           className="glass rounded-2xl p-6"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-800">Recent Activities</h3>
+            <h3 className="text-xl font-bold text-gray-800">{t('dashboard.recentActivities')}</h3>
             <Clock className="w-6 h-6 text-gray-600" />
           </div>
           <div className="space-y-4">
