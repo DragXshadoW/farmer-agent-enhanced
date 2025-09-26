@@ -15,7 +15,8 @@ const dictionary = {
       assistance: 'AI Assistance',
       weather: 'Weather',
       crops: 'Crop Database',
-      illness: 'Crop Illness'
+      illness: 'Crop Illness',
+      soilAnalysis: 'Soil Analysis'
     },
     dashboard: {
       welcome: 'Welcome to Farmer Agent',

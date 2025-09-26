@@ -7,6 +7,7 @@ import {
   Cloud, 
   Sprout, 
   Stethoscope, 
+  TestTube,
   Menu, 
   X,
   Leaf
@@ -25,6 +26,7 @@ const Navbar = () => {
     { path: '/weather', name: t('nav.weather'), icon: Cloud },
     { path: '/crops', name: t('nav.crops'), icon: Sprout },
     { path: '/illness', name: t('nav.illness'), icon: Stethoscope },
+    { path: '/soil-analysis', name: t('nav.soilAnalysis'), icon: TestTube },
   ];
 
   const isActive = (path) => location.pathname === path;
