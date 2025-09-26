@@ -438,10 +438,29 @@ const Assistance = () => {
                         
                         {/* Market Data */}
                         {message.marketData && (
-                          <div className="bg-green-50 rounded-lg p-2">
-                            <div className="flex items-center text-xs text-green-700">
-                              <TrendingUp className="w-3 h-3 mr-1" />
-                              Market: {message.marketData.crop} - ${message.marketData.price}/kg
+                          <div className="bg-green-50 rounded-lg p-3">
+                            <div className="space-y-1">
+                              <div className="flex items-center text-xs text-green-700">
+                                <TrendingUp className="w-3 h-3 mr-1" />
+                                <span className="font-medium">Indian Market Price</span>
+                              </div>
+                              <div className="text-sm text-green-800">
+                                <span className="font-semibold">{message.marketData.crop}</span> - 
+                                ₹{message.marketData.price}/{message.marketData.unit}
+                              </div>
+                              <div className="text-xs text-green-600">
+                                {message.marketData.market} • {message.marketData.category}
+                              </div>
+                              <div className="flex items-center text-xs">
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  message.marketData.trend === 'up' ? 'bg-red-100 text-red-700' :
+                                  message.marketData.trend === 'down' ? 'bg-green-100 text-green-700' :
+                                  'bg-gray-100 text-gray-700'
+                                }`}>
+                                  {message.marketData.trend === 'up' ? '↗ Rising' :
+                                   message.marketData.trend === 'down' ? '↘ Falling' : '→ Stable'}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         )}
